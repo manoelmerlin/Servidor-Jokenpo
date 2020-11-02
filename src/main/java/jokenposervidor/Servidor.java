@@ -59,7 +59,7 @@ public class Servidor {
 
         jogadores.get(0).comunicacao.EnviarMsg("Você está jogando contra " + jogadores.get(1).nomeJogador + ", faça sua jogada: pedra, papel ou tesoura");
         jogadores.get(0).jogada = jogadores.get(0).comunicacao.ReceberMsg();
-        
+
         while (!jogadores.get(0).jogada.equalsIgnoreCase("papel") && !jogadores.get(0).jogada.equalsIgnoreCase("pedra") && !jogadores.get(0).jogada.equalsIgnoreCase("tesoura")) {
             jogadores.get(0).comunicacao.EnviarMsg("faça uma jogada válida entre pedra, papel ou tesoura");
             jogadores.get(0).jogada = jogadores.get(0).comunicacao.ReceberMsg();
@@ -119,10 +119,10 @@ public class Servidor {
 
     public static void jogarContraCpu(List<Player> jogadores) throws IOException {
         Player jogador = jogadores.get(0);
-        jogador.comunicacao.EnviarMsg(jogadores.get(0).nomeJogador + " Faça sua jogada");
+        jogador.comunicacao.EnviarMsg(jogadores.get(0).nomeJogador + " faça sua jogada: pedra, papel ou tesoura");
         jogador.jogada = jogadores.get(0).comunicacao.ReceberMsg();
         while (!jogadores.get(0).jogada.equalsIgnoreCase("papel") && !jogadores.get(0).jogada.equalsIgnoreCase("pedra") && !jogadores.get(0).jogada.equalsIgnoreCase("tesoura")) {
-            jogadores.get(0).comunicacao.EnviarMsg("faça sua jogada");
+            jogadores.get(0).comunicacao.EnviarMsg("Faça uma jogada válida entre pedra, papel ou tesoura");
             jogadores.get(0).jogada = jogadores.get(0).comunicacao.ReceberMsg();
         }
         if (jogadores.get(0).jogada.equals("papel") || jogadores.get(0).jogada.equals("pedra") || jogadores.get(0).jogada.equals("tesoura")) {
@@ -172,10 +172,9 @@ public class Servidor {
                 modoJogo = jogadores.get(0).comunicacao.ReceberMsg();
             }
             jogadores.get(0).modoJogo = modoJogo;
-            if(modoJogo.equals("1")){
+            if (modoJogo.equals("1")) {
                 jogadores.get(0).comunicacao.EnviarMsg("Aguarde o outro jogador conectar, para iniciar o jogo clique em qualquer tecla");
-                String qualquerTecla;
-                qualquerTecla = jogadores.get(0).comunicacao.ReceberMsg();
+                String qualquerTecla = jogadores.get(0).comunicacao.ReceberMsg();
             }
         }
 
