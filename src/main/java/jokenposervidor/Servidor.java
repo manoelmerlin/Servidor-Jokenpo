@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Servidor {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         ServerSocket servidor = null;
         List<Player> jogadores = new ArrayList<Player>();
@@ -30,7 +30,7 @@ public class Servidor {
                     if (jogadores.size() == 2) {
                         if (jogadores.get(0).nomeJogador != null && jogadores.get(1).nomeJogador != null) {
                             jogarContraPlayer(jogadores);
-                            while (jogadores.get(0).jogarNovamente && jogadores.get(0).jogarNovamente) {
+                            while (jogadores.get(0).jogarNovamente && jogadores.get(1).jogarNovamente) {
                                 jogarContraPlayer(jogadores);
                             }
                         }
@@ -54,7 +54,7 @@ public class Servidor {
         }
     }
 
-    public static void jogarContraPlayer(List<Player> jogadores) throws IOException {
+    public static void jogarContraPlayer(List<Player> jogadores) throws IOException, InterruptedException {
         Jokenpo jogo = new Jokenpo();
 
         jogadores.get(0).comunicacao.EnviarMsg("Você está jogando contra " + jogadores.get(1).nomeJogador + ", faça sua jogada: pedra, papel ou tesoura");
@@ -79,19 +79,21 @@ public class Servidor {
 
                 String jogadaPlayerUm = jogadores.get(0).jogada;
 
-                for (int i = 0; i < jogadores.size(); i++) {
-                    if (i == 0) {
-                        jogadores.get(i).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(i).jogada + " e o " + jogadores.get(1).nomeJogador + " jogou : " + jogadores.get(1).jogada + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite qualquer tecla para sair");
-                    } else {
-                        jogadores.get(i).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(1).jogada + " e o " + jogadores.get(0).nomeJogador + " jogou : " + jogadaPlayerUm + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite qualquer tecla para sair");
-                    }
-                    if (jogadores.get(i).comunicacao.ReceberMsg().equals("1")) {
-                        jogadores.get(i).jogada = null;
-                        jogadores.get(i).jogarNovamente = true;
-                    } else {
-                        jogadores.get(i).comunicacao.EnviarMsg("Você ganhou = " + jogadores.get(i).getCountVitorias() + " empatou = " + jogadores.get(i).getCountEmpates() + " e perdeu = " + jogadores.get(i).getCountDerrotas() + " saindo....");
-                        jogadores.get(i).player.close();
-                    }
+                jogadores.get(0).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(0).jogada + " e o " + jogadores.get(1).nomeJogador + " jogou : " + jogadores.get(1).jogada + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite qualquer tecla para sair");
+                jogadores.get(1).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(1).jogada + " e o " + jogadores.get(0).nomeJogador + " jogou : " + jogadaPlayerUm + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite qualquer tecla para sair");
+
+                if (jogadores.get(0).comunicacao.ReceberMsg().equals("1") && jogadores.get(1).comunicacao.ReceberMsg().equals("1")) {
+                    jogadores.get(0).jogada = null;
+                    jogadores.get(0).jogarNovamente = true;
+                    jogadores.get(1).jogada = null;
+                    jogadores.get(1).jogarNovamente = true;
+
+                } else {
+                    jogadores.get(0).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(0).getCountVitorias() + " empatou = " + jogadores.get(0).getCountEmpates() + " e perdeu = " + jogadores.get(0).getCountDerrotas() + " saindo....");
+                    jogadores.get(0).player.close();
+                    Thread.sleep(500);
+                    jogadores.get(1).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(1).getCountVitorias() + " empatou = " + jogadores.get(1).getCountEmpates() + " e perdeu = " + jogadores.get(1).getCountDerrotas() + " saindo....");
+                    jogadores.get(1).player.close();
                 }
             }
         }
