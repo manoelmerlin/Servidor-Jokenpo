@@ -1,7 +1,6 @@
 package jokenposervidor;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -20,6 +19,8 @@ public class Servidor {
             while (true) {
                 System.out.println("Aguardando conexão...");
                 Socket clienteSocket = servidor.accept();
+                System.out.println("Conectado com " + clienteSocket.getInetAddress().getHostAddress());
+
                 Player player = new Player(clienteSocket);
                 jogadores.add(player);
                 setPlayerGameMode(jogadores);
@@ -64,20 +65,45 @@ public class Servidor {
         
         if (jogadores.get(0).jogada != null && jogadores.get(1).jogada != null) {
             String vencedor = jogo.retornarVencedor(jogadores.get(0).nomeJogador, jogadores.get(1).nomeJogador, jogadores.get(0).jogada, jogadores.get(1).jogada);
+            contabilizarPartidaPvp(jogadores, vencedor);
             
+            String jogadaPlayerUm = jogadores.get(0).jogada;
+
             for (int i = 0; i < jogadores.size(); i ++) {
-                jogadores.get(i).comunicacao.EnviarMsg("O vencedor foi: " + vencedor + " você deseja jogar novamente ?");
-            }
-            
-            for (int i = 0; i < jogadores.size(); i ++) {
-                if (jogadores.get(i).comunicacao.ReceberMsg().equalsIgnoreCase("sim")) {
+                if (i == 0) {
+                    jogadores.get(i).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(i).jogada + " e o " + jogadores.get(1).nomeJogador + " Jogou : " + jogadores.get(1).jogada + " *********** O vencedor foi: " + vencedor + " *********** você deseja jogar novamente 1 - Sim ou pressione qualquer tecla para sair?");         
+                } else {
+                    jogadores.get(i).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(1).jogada + " e o " + jogadores.get(0).nomeJogador + " Jogou : " + jogadaPlayerUm + " *********** O vencedor foi: " + vencedor + " *********** você deseja jogar novamente 1 - Sim ou pressione qualquer tecla para sair?");
+                }
+                if (jogadores.get(i).comunicacao.ReceberMsg().equalsIgnoreCase("1")) {
                     jogadores.get(i).jogada = null;
                     jogadores.get(i).jogarNovamente = true;
                 } else {
-                    jogadores.get(i).jogarNovamente = false;
+                    jogadores.get(i).comunicacao.EnviarMsg("Você ganhou = " + jogadores.get(i).getCountVitorias() + " empatou = " +  jogadores.get(i).getCountEmpates() + " e perdeu = " + jogadores.get(i).getCountDerrotas() + " saindo....");
+                    jogadores.get(i).player.close();
                 }            
-             }          
+            }          
         }   
+    }
+
+    public static void contabilizarPartidaPvp(List<Player> jogadores, String vencedor) {
+        if (vencedor.equals(jogadores.get(0).nomeJogador)) {
+            setWin(jogadores.get(0));
+        } else if (vencedor.equals(jogadores.get(1).nomeJogador)) {
+            setWin(jogadores.get(1));
+        }
+
+        if (vencedor.equals("empate")) {
+            for (int i = 0; i < jogadores.size(); i++) {
+                setDraw(jogadores.get(i));
+            }
+        }
+
+        if (vencedor.equals(jogadores.get(0).nomeJogador)) {
+            setLose(jogadores.get(1));
+        } else if (vencedor.equals(jogadores.get(1).nomeJogador)) {
+            setLose(jogadores.get(0));
+        }
     }
     
     public static void jogarContraCpu(List<Player> jogadores) throws IOException {
@@ -121,13 +147,17 @@ public class Servidor {
         }
     }
     
-     public static void setPlayerGameMode (List<Player> jogadores) throws IOException {
-        for (int i = 0; i < jogadores.size(); i ++) {
-            if (jogadores.get(i).modoJogo == null) {
-                jogadores.get(i).comunicacao.EnviarMsg("Selecione o modo de jogo 1 - PVP | 2 - Player Vs CPU");
-                jogadores.get(i).modoJogo = jogadores.get(i).comunicacao.ReceberMsg();
+    public static void setPlayerGameMode (List<Player> jogadores) throws IOException {
+        if (jogadores.get(0).modoJogo == null) {
+            jogadores.get(0).comunicacao.EnviarMsg("Selecione o modo de jogo 1 - PVP | 2 - Player Vs CPU");
+            String modoJogo = jogadores.get(0).comunicacao.ReceberMsg();
+            while (!modoJogo.equals("1") && !modoJogo.equals("2")) {
+                jogadores.get(0).comunicacao.EnviarMsg("Selecione o modo de jogo 1 - PVP | 2 - Player Vs CPU");
+                modoJogo = jogadores.get(0).comunicacao.ReceberMsg();
             }
+            jogadores.get(0).modoJogo = modoJogo;
         }
+        
     }
     
     public static void setWin(Player player) {
