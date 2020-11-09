@@ -10,7 +10,8 @@ public class Player extends Thread {
     String nomeJogador = null;
     String modoJogo = null;
     String jogada = null;
-    boolean jogarNovamente = false;
+    boolean jogarNovamente = true;
+    String escolhaJogador = null;
     private int countVitorias = 0;
     private int countEmpates = 0;
     private int countDerrotas = 0;
