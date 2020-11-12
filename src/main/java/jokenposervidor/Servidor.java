@@ -79,22 +79,21 @@ public class Servidor {
             contabilizarPartidaPvp(jogadores, vencedor);
             String jogadaPlayerUm = jogadores.get(0).jogada;
 
-            jogadores.get(0).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(0).jogada + " e o " + jogadores.get(1).nomeJogador + " jogou : " + jogadores.get(1).jogada + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite Ou aperte qualquer tecla para sair");
-            jogadores.get(1).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(1).jogada + " e o " + jogadores.get(0).nomeJogador + " jogou : " + jogadaPlayerUm + " *********** O vencedor foi: " + vencedor + " *********** se você deseja jogar novamente digite 1 - Sim ou digite Ou aperte qualquer tecla para sair para sair");
+            jogadores.get(0).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(0).jogada + " e o " + jogadores.get(1).nomeJogador + " jogou : " + jogadores.get(1).jogada + " *********** O vencedor foi: " + vencedor + " *********** " + " Você ganhou = " + jogadores.get(0).getCountVitorias() + " empatou = " + jogadores.get(0).getCountEmpates() + " e perdeu = " + jogadores.get(0).getCountDerrotas() + " se você deseja jogar novamente digite 1 - Sim ou digite Ou aperte qualquer tecla para sair");
+            jogadores.get(1).comunicacao.EnviarMsg("Você jogou : " + jogadores.get(1).jogada + " e o " + jogadores.get(0).nomeJogador + " jogou : " + jogadaPlayerUm + " *********** O vencedor foi: " + vencedor + " ***********  para sair" + " Você ganhou = " + jogadores.get(1).getCountVitorias() + " empatou = " + jogadores.get(1).getCountEmpates() + " e perdeu = " + jogadores.get(1).getCountDerrotas() + " se você deseja jogar novamente digite 1 - Sim ou digite Ou aperte qualquer tecla para sair");
 
-            if (jogadores.get(0).comunicacao.ReceberMsg().equals("1") && jogadores.get(1).comunicacao.ReceberMsg().equals("1")) {
+            if (jogadores.get(1).comunicacao.ReceberMsg().equals("1") && jogadores.get(0).comunicacao.ReceberMsg().equals("1")) {
                 jogadores.get(0).jogada = null;
                 jogadores.get(0).jogarNovamente = true;
                 jogadores.get(1).jogada = null;
                 jogadores.get(1).jogarNovamente = true;
             } else {
-                jogadores.get(0).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(0).getCountVitorias() + " empatou = " + jogadores.get(0).getCountEmpates() + " e perdeu = " + jogadores.get(0).getCountDerrotas() + " Aperte 10 para sair do servidor");
-                jogadores.get(1).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(1).getCountVitorias() + " empatou = " + jogadores.get(1).getCountEmpates() + " e perdeu = " + jogadores.get(1).getCountDerrotas() + " Aperte 10 para sair do servidor");
-                jogadores.get(0).comunicacao.ReceberMsg();
-                jogadores.get(1).comunicacao.ReceberMsg();
+                jogadores.get(1).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(1).getCountVitorias() + " empatou = " + jogadores.get(1).getCountEmpates() + " e perdeu = " + jogadores.get(1).getCountDerrotas() + " Aperte 10 para confirmar a saída");
+                jogadores.get(0).comunicacao.EnviarMsg("Um dos jogadores escolheu sair... Você ganhou = " + jogadores.get(0).getCountVitorias() + " empatou = " + jogadores.get(0).getCountEmpates() + " e perdeu = " + jogadores.get(0).getCountDerrotas() + " Aperte 10 para confirmar a saída");
+                jogadores.get(1).player.close();
+                jogadores.get(0).player.close();
             }
         }
-        
     }
 
     public static void contabilizarPartidaPvp(List<Player> jogadores, String vencedor) {
@@ -132,7 +131,7 @@ public class Servidor {
         String jogadaCpu = jogo.retornarJogadaCpu();
         String vencedor = jogo.retornarVencedor("CPU", jogador.nomeJogador, jogadaCpu, jogador.jogada);
 
-        jogador.comunicacao.EnviarMsg("Você jogou " + jogador.jogada + " e a CPU jogou " + jogadaCpu + " *********** O vencedor foi : " + vencedor + " *********** Deseja jogar novamente ? 1 - Sim | 10 - Não");
+        jogador.comunicacao.EnviarMsg("Você jogou " + jogador.jogada + " e a CPU jogou " + jogadaCpu + " *********** O vencedor foi : " + vencedor + " *********** Deseja jogar novamente ? 1 - Sim | 2 - Não");
         String jogarNovamente = jogador.comunicacao.ReceberMsg();
 
         if (vencedor.equals("CPU")) {
@@ -143,13 +142,13 @@ public class Servidor {
             setDraw(jogador);
         }
 
-        while (!jogarNovamente.equals("1") && !jogarNovamente.equals("10")) {
-            jogador.comunicacao.EnviarMsg("Deseja jogar novamente 1 - Sim | 10 - Não");
+        while (!jogarNovamente.equals("1") && !jogarNovamente.equals("2")) {
+            jogador.comunicacao.EnviarMsg("Deseja jogar novamente 1 - Sim | 2 - Não");
             jogarNovamente = jogador.comunicacao.ReceberMsg();
         }
 
-        if (jogarNovamente.equals("10")) {
-            jogador.comunicacao.EnviarMsg("Você ganhou = " + jogador.getCountVitorias() + ", Empatou = " + jogador.getCountEmpates() + " e perdeu = " + jogador.getCountDerrotas() + " *********** A CPU ganhou = " + jogador.getCountDerrotas() + ", Empatou = " + jogador.getCountEmpates() + " e perdeu = " + jogador.getCountVitorias() + " *********** saindo...");
+        if (jogarNovamente.equals("2")) {
+            jogador.comunicacao.EnviarMsg("Você ganhou = " + jogador.getCountVitorias() + ", Empatou = " + jogador.getCountEmpates() + " e perdeu = " + jogador.getCountDerrotas() + " *********** A CPU ganhou = " + jogador.getCountDerrotas() + ", Empatou = " + jogador.getCountEmpates() + " e perdeu = " + jogador.getCountVitorias() + " *********** sair do servidor - 10");
             jogador.jogarNovamente = false;
         } else {
             jogador.jogarNovamente = true;
@@ -175,7 +174,6 @@ public class Servidor {
             }
             jogadores.get(0).modoJogo = modoJogo;
         }
-
     }
 
     public static void fazerJogada () {
